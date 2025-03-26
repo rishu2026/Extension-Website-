@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRCTC Tatkal Extension</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function updatePrice() {
+            const days = document.getElementById("days").value;
+            let price = days * 30;
+
+            if (days == 5) {
+                price = price - (price * 0.10); // 10% discount for 5 days
+            } else if (days == 30) {
+                price = 700; // Special price for 30 days
+            }
+
+            document.getElementById("price").innerText = "Total Price: ₹" + price;
+        }
+    </script>
+</head>
+<body>
+
+    <header>
+        <h1>IRCTC Tatkal Ticket Booking Extension</h1>
+        <p>Secure your Tatkal tickets easily with our automation tool!</p>
+    </header>
+
+    <section class="payment">
+        <h2>Step 1: Select Validity & Make Payment</h2>
+        <label for="days">Select Days:</label>
+        <select id="days" onchange="updatePrice()">
+            <option value="1">1 Day - ₹30</option>
+            <option value="2">2 Days - ₹60</option>
+            <option value="3">3 Days - ₹90</option>
+            <option value="4">4 Days - ₹120</option>
+            <option value="5">5 Days - ₹135 (10% OFF)</option>
+            <option value="30">30 Days - ₹700</option>
+        </select>
+
+        <p id="price">Total Price: ₹30</p>
+        <p>Pay the amount to UPI ID: <strong>7361914042@ybl</strong></p>
+        <img src="upi_qr.png" alt="UPI QR Code">
+        <p>After payment, note down the **UTR ID**.</p>
+    </section>
+
+    <section class="form-container">
+        <h2>Step 2: Enter Your Details</h2>
+        <form action="submit.php" method="POST">
+            <label for="username">Username:</label>
+            <input type="text" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" name="password" required>
+
+            <label for="mobile">Mobile No:</label>
+            <input type="text" name="mobile" required>
+
+            <label for="utr">Payment UTR ID:</label>
+            <input type="text" name="utr" required>
+
+            <input type="hidden" name="days" id="selectedDays">
+            <input type="hidden" name="amount" id="selectedAmount">
+
+            <button type="submit" onclick="setValues()">Submit & Download</button>
+        </form>
+    </section>
+
+    <script>
+        function setValues() {
+            document.getElementById("selectedDays").value = document.getElementById("days").value;
+            document.getElementById("selectedAmount").value = document.getElementById("price").innerText.replace("Total Price: ₹", "");
+        }
+    </script>
+
+</body>
+</html>
