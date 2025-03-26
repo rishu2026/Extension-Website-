@@ -1,22 +1,40 @@
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = htmlspecialchars($_POST["username"]);
+    $extusername = htmlspecialchars($_POST["extusername"]);
     $password = htmlspecialchars($_POST["password"]);
     $mobile = htmlspecialchars($_POST["mobile"]);
-    $utr = htmlspecialchars($_POST["utr"]);
+    $utrid = htmlspecialchars($_POST["utrid"]);
     $days = htmlspecialchars($_POST["days"]);
     $amount = htmlspecialchars($_POST["amount"]);
+    $timestamp = date("Y-m-d H:i:s");
 
-    // Store user data in a file (can be replaced with a database)
-    $file = fopen("submissions.txt", "a");
-    fwrite($file, "Username: $username | Mobile: $mobile | UTR: $utr | Days: $days | Amount: ₹$amount\n");
-    fclose($file);
+    // Google Sheets API URL
+    $google_sheets_url = "https://sheets.googleapis.com/v4/spreadsheets/17UiVgPtCHTMshdopI1mc3moRSL9BAvWhNvYjNMaZrfU/values/Sheet1:append?valueInputOption=RAW&key=AIzaSyBL2tlF2BAxoil0UXEiyA6I51iOgpOuOkw";
 
-    // Redirect to extension download page (Make sure extension.zip is uploaded)
-    header("Location: extension.zip");
+    // Data to send
+    $postData = [
+        "values" => [
+            [$extusername, $password, $mobile, $utrid, $days, $amount, $timestamp]
+        ]
+    ];
+
+    // Convert to JSON
+    $jsonData = json_encode($postData);
+
+    // Send data to Google Sheets
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $google_sheets_url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    // Redirect to download the extension
+    header("Location: Tatkal_EXT.zip");
     exit();
 } else {
     echo "Invalid request!";
 }
 ?>
-
