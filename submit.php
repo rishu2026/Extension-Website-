@@ -9,7 +9,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $timestamp = date("Y-m-d H:i:s");
 
     // Google Sheets API URL
-    $google_sheets_url = "https://sheets.googleapis.com/v4/spreadsheets/17UiVgPtCHTMshdopI1mc3moRSL9BAvWhNvYjNMaZrfU/values/Sheet1:append?valueInputOption=RAW&key=AIzaSyBL2tlF2BAxoil0UXEiyA6I51iOgpOuOkw";
+$google_sheets_url = "https://sheets.googleapis.com/v4/spreadsheets/17UiVgPtCHTMshdopI1mc3moRSL9BAvWhNvYjNMaZrfU/values/Sheet1:append?valueInputOption=USER_ENTERED";
+
+$headers = [
+    "Content-Type: application/json",
+    "Authorization: Bearer YOUR_ACCESS_TOKEN"  // Replace with a valid access token
+];
+
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $google_sheets_url);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(["values" => [[$extusername, $password, $mobile, $utrid, $days, $amount, $timestamp]]]));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+curl_close($ch);
 
     // Data to send
     $postData = [
