@@ -31,9 +31,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $response = curl_exec($ch);
     curl_close($ch);
 
-    // Redirect to download the extension
-    header("Location: Tatkal_EXT.zip");
-    exit();
+    // Check if data is successfully added to Google Sheets
+    if ($response) {
+        echo "<script>alert('Payment Verified! Click OK to Download.'); window.location.href='Tatkal_EXT.zip';</script>";
+    } else {
+        echo "<script>alert('Error in Payment Verification! Try Again.'); window.history.back();</script>";
+    }
 } else {
     echo "Invalid request!";
 }
