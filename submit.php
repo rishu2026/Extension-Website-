@@ -1,4 +1,9 @@
 <?php
+require 'vendor/autoload.php';  // Load Google API Client Library
+
+use Google\Client;
+use Google\Service\Sheets;
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $extusername = htmlspecialchars($_POST["extusername"]);
     $password = htmlspecialchars($_POST["password"]);
@@ -8,45 +13,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $amount = htmlspecialchars($_POST["amount"]);
     $timestamp = date("Y-m-d H:i:s");
 
-    // Google Sheets API URL
-$google_sheets_url = "https://sheets.googleapis.com/v4/spreadsheets/17UiVgPtCHTMshdopI1mc3moRSL9BAvWhNvYjNMaZrfU/values/Sheet1:append?valueInputOption=USER_ENTERED";
+    // Load Google Client
+    $client = new Client();
+    $client->setAuthConfig('your-service-account.json');  // Path to your JSON key file
+    $client->addScope(Google\Service\Sheets::SPREADSHEETS);
 
-$headers = [
-    "Content-Type: application/json",
-    "Authorization: Bearer YOUR_ACCESS_TOKEN"  // Replace with a valid access token
-];
+    // Create Google Sheets Service
+    $service = new Sheets($client);
+    $spreadsheetId = "17UiVgPtCHTMshdopI1mc3moRSL9BAvWhNvYjNMaZrfU";  // Your Sheet ID
+    $range = "Sheet1";  // Your Sheet name
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $google_sheets_url);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(["values" => [[$extusername, $password, $mobile, $utrid, $days, $amount, $timestamp]]]));
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-curl_close($ch);
-
-    // Data to send
-    $postData = [
-        "values" => [
-            [$extusername, $password, $mobile, $utrid, $days, $amount, $timestamp]
-        ]
+    // Data to insert
+    $values = [
+        [$extusername, $password, $mobile, $utrid, $days, $amount, $timestamp]
     ];
 
-    // Convert to JSON
-    $jsonData = json_encode($postData);
+    $body = new Google\Service\Sheets\ValueRange([
+        'values' => $values
+    ]);
 
-    // Send data to Google Sheets
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $google_sheets_url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response = curl_exec($ch);
-    curl_close($ch);
+    $params = ['valueInputOption' => 'USER_ENTERED'];
+    $insert = [
+        "insertDataOption" => "INSERT_ROWS"
+    ];
 
-    // Check if data is successfully added to Google Sheets
-    if ($response) {
+    // Append data to Google Sheet
+    $result = $service->spreadsheets_values->append($spreadsheetId, $range, $body, $params, $insert);
+
+    // Check if successful
+    if ($result) {
         echo "<script>alert('Payment Verified! Click OK to Download.'); window.location.href='Tatkal_EXT.zip';</script>";
     } else {
         echo "<script>alert('Error in Payment Verification! Try Again.'); window.history.back();</script>";
