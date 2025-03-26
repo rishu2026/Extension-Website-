@@ -1,78 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IRCTC Tatkal Extension</title>
-    <link rel="stylesheet" href="styles.css">
-    <script>
-        function updatePrice() {
-            const days = document.getElementById("days").value;
-            let price = days * 30;
+<form action="submit.php" method="POST">
+    <label>Username:</label>
+    <input type="text" name="extusername" required><br>
 
-            if (days == 5) {
-                price = price - (price * 0.10); // 10% discount for 5 days
-            } else if (days == 30) {
-                price = 700; // Special price for 30 days
-            }
+    <label>Password:</label>
+    <input type="password" name="password" required><br>
 
-            document.getElementById("price").innerText = "Total Price: ₹" + price;
-        }
-    </script>
-</head>
-<body>
+    <label>Mobile Number:</label>
+    <input type="text" name="mobile" required><br>
 
-    <header>
-        <h1>IRCTC Tatkal Ticket Booking Extension</h1>
-        <p>Secure your Tatkal tickets easily with our automation tool!</p>
-    </header>
+    <label>UTR ID:</label>
+    <input type="text" name="utrid" required><br>
 
-    <section class="payment">
-        <h2>Step 1: Select Validity & Make Payment</h2>
-        <label for="days">Select Days:</label>
-        <select id="days" onchange="updatePrice()">
-            <option value="1">1 Day - ₹30</option>
-            <option value="2">2 Days - ₹60</option>
-            <option value="3">3 Days - ₹90</option>
-            <option value="4">4 Days - ₹120</option>
-            <option value="5">5 Days - ₹135 (10% OFF)</option>
-            <option value="30">30 Days - ₹700</option>
-        </select>
+    <label>Select Days:</label>
+    <select name="days" id="days" onchange="updateAmount()">
+        <option value="1">1 Day - ₹30</option>
+        <option value="2">2 Days - ₹60</option>
+        <option value="3">3 Days - ₹90</option>
+        <option value="4">4 Days - ₹120</option>
+        <option value="5">5 Days - ₹135 (10% Discount)</option>
+        <option value="30">30 Days - ₹700</option>
+    </select><br>
 
-        <p id="price">Total Price: ₹30</p>
-        <p>Pay the amount to UPI ID: <strong>7361914042@ybl</strong></p>
-        <img src="PhonePeQR_State Bank of India - 25880.png" alt="UPI QR Code">
-        <p>After payment, note down the **UTR ID**.</p>
-    </section>
+    <label>Amount:</label>
+    <input type="text" name="amount" id="amount" readonly><br>
 
-    <section class="form-container">
-        <h2>Step 2: Enter Your Details</h2>
-        <form action="submit.php" method="POST">
-            <label for="username">Username:</label>
-            <input type="text" name="username" required>
+    <button type="submit">Submit & Download</button>
+</form>
 
-            <label for="password">Password:</label>
-            <input type="password" name="password" required>
-
-            <label for="mobile">Mobile No:</label>
-            <input type="text" name="mobile" required>
-
-            <label for="utr">Payment UTR ID:</label>
-            <input type="text" name="utr" required>
-
-            <input type="hidden" name="days" id="selectedDays">
-            <input type="hidden" name="amount" id="selectedAmount">
-
-            <button type="submit" onclick="setValues()">Submit & Download</button>
-        </form>
-    </section>
-
-    <script>
-        function setValues() {
-            document.getElementById("selectedDays").value = document.getElementById("days").value;
-            document.getElementById("selectedAmount").value = document.getElementById("price").innerText.replace("Total Price: ₹", "");
-        }
-    </script>
-
-</body>
-</html>
+<script>
+function updateAmount() {
+    let days = document.getElementById("days").value;
+    let price;
+    if (days == 5) {
+        price = 135; // 10% discount
+    } else if (days == 30) {
+        price = 700;
+    } else {
+        price = days * 30;
+    }
+    document.getElementById("amount").value = price;
+}
+</script>
